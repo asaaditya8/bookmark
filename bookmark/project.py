@@ -77,7 +77,6 @@ def main():
         imgui.set_next_window_position(370, 50)
         imgui.begin("Results", True)
         imgui.set_window_size(800, 600)
-        # imgui.begin_child('abc2', 750, 550, True)
 
         result_view.list_changed, result_view.selection_idx = imgui.listbox('', result_view.selection_idx, result_data.search_result_display, 100)
 
@@ -87,8 +86,6 @@ def main():
             if search_view.check1:
                 cmd += f' -l \"{search_view.text_val.strip()}\"'
             os.system(cmd)
-
-        # imgui.end_child()
 
         imgui.end()
 
