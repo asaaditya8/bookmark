@@ -11,11 +11,13 @@ from bookmark import FONT_SIZE_IN_PIXELS, FONT_PATH_PRIMARY
 from bookmark.data import Result, ResultView, SearchView
 from bookmark.search.strict.utils import SearchTextCommand
 
+
 def fb_to_window_factor(window):
     win_w, win_h = glfw.get_window_size(window)
     fb_w, fb_h = glfw.get_framebuffer_size(window)
 
     return max(float(fb_w) / win_w, float(fb_h) / win_h)
+
 
 def main():
     imgui.create_context()

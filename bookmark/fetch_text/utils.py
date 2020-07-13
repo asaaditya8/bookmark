@@ -1,9 +1,5 @@
-from bookmark.fetch_text import BOOK_PATHS
-
 from io import StringIO
-import logging
 import re
-import sys
 from typing import Tuple
 
 from pdfminer.converter import TextConverter
@@ -54,8 +50,8 @@ def extract_text(pdf_file, password='', page_numbers=None, maxpages=0,
             yield pageno, output_string.getvalue()
 
 
-def get_data_as_pages() -> Tuple[str, int, str]:
-    for path in BOOK_PATHS:
+def get_data_as_pages(data_dir) -> Tuple[str, int, str]:
+    for path in data_dir:
         for pageno, page_text in extract_text(path):
             page_text = re.sub('[^<\w.,\/\<\>?;:\'\"\[\]{}!@#$%\^&\*\-_+=`~()>]', ' ', page_text)
             page_text = re.sub('\s{2,}', ' ', page_text)
@@ -68,6 +64,7 @@ def get_data_as_sentences() -> Tuple[str, int, str]:
         doc = nlp(page_text)
         for sent in doc.sents:
             yield path, pageno, sent.text
+
 
 def get_keywords():
     pass

@@ -1,7 +1,4 @@
 from whoosh.qparser import QueryParser
-from whoosh.index import FileIndex
-
-import numpy as np
 
 
 class SearchTextCommand:

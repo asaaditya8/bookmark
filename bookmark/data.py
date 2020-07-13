@@ -1,6 +1,13 @@
 from bookmark.build.strict.indexing import load_index
 from bookmark.fetch_text.utils import get_data_as_pages
 
+import json
+from functools import partial
+
+configs = None
+with open('config.json', 'r') as f:
+    configs = json.load(f)
+
 
 class Result(object):
     def __init__(self):
@@ -10,7 +17,7 @@ class Result(object):
         self.search_result_pageno = []
         self.search_result_path = []
         self.search_result_display = []
-        self.ix = load_index('/home/aaditya/Code/summer_20/bookmark/indexdir', get_data_as_pages)
+        self.ix = load_index(configs['INDEX_DIR'], partial(get_data_as_pages, configs['PDF_DIR']))
 
 
 class ResultView(object):
