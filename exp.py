@@ -130,6 +130,9 @@ for i, (pageno, path, page_text) in enumerate(get_data_as_pages()):
         break
 
 # %%
+text
+
+# %%
 sentences = []
 en = textacy.load_spacy_lang('en_core_web_sm')
 doc = textacy.make_spacy_doc(page_text, lang=en)
@@ -150,8 +153,11 @@ sentences
 lxr = LexRank(sentences, stopwords=STOPWORDS['en'])
 
 # %%
-summary = lxr.get_summary(sentences, summary_size=3, threshold=.1)
-summary[1:]
+summary = lxr.get_summary(sentences, summary_size=5, threshold=0.3)
+summary
+
+# %%
+[sentences[i] for i in lxr.rank_sentences(sentences).argsort()[::-1]]
 
 # %%
 import textacy.ke

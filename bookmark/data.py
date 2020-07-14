@@ -8,16 +8,24 @@ configs = None
 with open('config.json', 'r') as f:
     configs = json.load(f)
 
+FONT_SIZE_IN_PIXELS = configs['FONT_SIZE_IN_PIXELS']
+FONT_PATH_PRIMARY = configs['FONT_PATH_PRIMARY']
+
 
 class Result(object):
     def __init__(self):
-        self.search_result_remaining = False
-        self.search_pagelen = 10
-        self.search_result_len = 0
-        self.search_result_pageno = []
-        self.search_result_path = []
-        self.search_result_display = []
-        self.ix = load_index(configs['INDEX_DIR'], partial(get_data_as_pages, configs['PDF_DIR']))
+        self.remaining = False
+        self.pagelen = 10
+        self.len = 0
+        self.pageno = []
+        self.path = []
+        self.keywords = []
+        self.description = []
+        self.display = []
+        self.ix = load_index(configs['INDEX_DIR'], partial(get_data_as_pages,
+                                                           data_dir=configs['PDF_DIR'],
+                                                           desc_size=configs['DESC_LEN'],
+                                                           desc_threshold=configs['DESC_THRESHOLD']))
 
 
 class ResultView(object):

@@ -1,6 +1,10 @@
 from io import StringIO
+import random
 import re
-from typing import Tuple
+from typing import Tuple, Union, IO, List, Iterable
+
+from lexrank import LexRank
+from lexrank.mappings.stopwords import STOPWORDS
 
 from pdfminer.converter import TextConverter
 from pdfminer.layout import LAParams
@@ -9,10 +13,15 @@ from pdfminer.pdfpage import PDFPage
 from pdfminer.utils import open_filename
 
 import spacy
+from spacy.language import Language
+
+import textacy
+import textacy.ke
 
 
-def extract_text(pdf_file, password='', page_numbers=None, maxpages=0,
-                 caching=True, codec='utf-8', laparams=None):
+
+def extract_text(pdf_file: Union[IO, str], password: str = '', page_numbers: int = None, maxpages: int = 0,
+                 caching : bool = True, codec : str = 'utf-8', laparams : LAParams = None) -> str:
     """Parse and return the text contained in a PDF file.
 
     :param pdf_file: Either a file path or a file-like object for the PDF file
@@ -50,21 +59,41 @@ def extract_text(pdf_file, password='', page_numbers=None, maxpages=0,
             yield pageno, output_string.getvalue()
 
 
-def get_data_as_pages(data_dir) -> Tuple[str, int, str]:
+def get_data_as_pages(data_dir: str, lang: Language, desc_size : int, desc_threshold : float) -> Tuple[str, int, str]:
     for path in data_dir:
         for pageno, page_text in extract_text(path):
-            page_text = re.sub('[^<\w.,\/\<\>?;:\'\"\[\]{}!@#$%\^&\*\-_+=`~()>]', ' ', page_text)
-            page_text = re.sub('\s{2,}', ' ', page_text)
-            yield path, pageno, page_text
+            page_text = clean_text(page_text)
+            yield path, pageno, page_text, get_keywords(page_text, lang), \
+                  get_summary(break_into_sentences(page_text, lang), desc_size, desc_threshold)
 
 
-def get_data_as_sentences() -> Tuple[str, int, str]:
-    nlp = spacy.load("en_core_web_sm")
-    for path, pageno, page_text in get_data_as_pages():
-        doc = nlp(page_text)
-        for sent in doc.sents:
-            yield path, pageno, sent.text
+def clean_text(page_text : str) -> str:
+    page_text = re.sub('[^<\w.,\/\<\>?;:\'\"\[\]{}!@#$%\^&\*\-_+=`~()>]', ' ', page_text)
+    page_text = re.sub('\s{2,}', ' ', page_text)
+    return page_text
 
 
-def get_keywords():
-    pass
+def get_keywords(data : str, lang : Language) -> List[str]:
+    doc = textacy.make_spacy_doc(data, lang=lang)
+    return list(map(lambda x: x[0], textacy.ke.scake(doc)))
+
+
+def break_into_sentences(data : str, lang : Language) -> List[str]:
+    doc = lang(data)
+    return list(map(lambda sent: sent.text, doc.sents))
+
+
+def get_summary(sentences : List[str], size : int, threshold : float) -> List[str]:
+    try:
+        return get_lex_summary(sentences, size, threshold)
+    except:
+        return get_random_summary(sentences, size)
+
+
+def get_lex_summary(sentences : List[str], size : int, threshold : float) -> List[str]:
+    lxr = LexRank(sentences, stopwords=STOPWORDS['en'])
+    return lxr.get_summary(sentences, summary_size=size, threshold=threshold)
+
+
+def get_random_summary(sentences : List[str], size : int) -> List[str]:
+    return [sentences[i] for i in sorted(random.choices(range(len(sentences)), k=size))]

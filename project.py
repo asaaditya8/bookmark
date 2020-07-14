@@ -7,8 +7,7 @@ import OpenGL.GL as gl
 import imgui
 from imgui.integrations.glfw import GlfwRenderer
 
-from bookmark import FONT_SIZE_IN_PIXELS, FONT_PATH_PRIMARY
-from bookmark.data import Result, ResultView, SearchView
+from bookmark.data import *
 from bookmark.search.strict.utils import SearchTextCommand
 
 
@@ -20,6 +19,10 @@ def fb_to_window_factor(window):
 
 
 def main():
+    search_view = SearchView()
+    result_data = Result()
+    result_view = ResultView()
+
     imgui.create_context()
     window = impl_glfw_init()
     impl = GlfwRenderer(window)
@@ -37,10 +40,6 @@ def main():
         FONT_PATH_PRIMARY, FONT_SIZE_IN_PIXELS * font_scaling_factor
     )
     impl.refresh_font_texture()
-
-    search_view = SearchView()
-    result_data = Result()
-    result_view = ResultView()
 
     while not glfw.window_should_close(window):
         glfw.poll_events()
@@ -75,20 +74,34 @@ def main():
 
         imgui.end_child()
         imgui.end()
-
+        # imgui.same_line()
         imgui.set_next_window_position(370, 50)
-        imgui.begin("Results", True)
-        imgui.set_window_size(800, 600)
+        imgui.begin("Results", True, imgui.WINDOW_HORIZONTAL_SCROLLING_BAR)
+        imgui.set_window_size(900, 600)
 
-        result_view.list_changed, result_view.selection_idx = imgui.listbox('', result_view.selection_idx, result_data.search_result_display, 100)
+        imgui.begin_child('but', 40)
+        result_view.list_changed, result_view.selection_idx = imgui.listbox('', result_view.selection_idx, result_data.display, 25)
 
         if result_view.list_changed:
             # Display PDF File at particular Page
-            cmd = f'evince {result_data.search_result_path[result_view.selection_idx]} -p {result_data.search_result_pageno[result_view.selection_idx]}'
+            cmd = f'evince {result_data.path[result_view.selection_idx]} -p {result_data.pageno[result_view.selection_idx]}'
             if search_view.check1:
                 cmd += f' -l \"{search_view.text_val.strip()}\"'
             os.system(cmd)
 
+        imgui.end_child()
+        imgui.same_line()
+        imgui.begin_child('desc')
+        imgui.push_text_wrap_position(imgui.get_cursor_pos().x + 800)
+        for i in range(result_data.len):
+            imgui.text_colored(result_data.path[i], 0.5, 0.5, 0.5)
+            imgui.text('Page: ' + result_data.pageno[i])
+            imgui.text_colored('Tags: ' + result_data.keywords[i], 0.1, 0.9, 0.2)
+            imgui.text_colored(result_data.description[i], 1, 1, 0.3)
+            imgui.text('')
+            imgui.text('')
+        imgui.pop_text_wrap_position()
+        imgui.end_child()
         imgui.end()
 
         gl.glClearColor(1., 1., 1., 1)
