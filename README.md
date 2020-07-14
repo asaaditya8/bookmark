@@ -1,5 +1,7 @@
 # Bookmark
 
+### How to setup environment?
+
 ### How to run?
 - Create a configuration file.
 - Add all the required parameters.
