@@ -1,6 +1,7 @@
 # Bookmark
 
 ### Requirements
+```
 python >= 3.6
 pyimgui
 glfw (it is one of the pyimgui's supported backends)
@@ -9,7 +10,7 @@ textacy
 whoosh
 lexrank
 tqdm
-
+```
 
 ### How to setup environment?
 
