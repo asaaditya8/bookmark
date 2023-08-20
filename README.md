@@ -1,4 +1,5 @@
 # Bookmark
+Utility for searching PDFs.
 
 ### Requirements
 ```
@@ -17,6 +18,10 @@ tqdm
 ```
 conda create -n myenv -c conda-forge python=3.6
 # For packages available in anaconda
+# Using mamba
+mamba install <package_name>
+
+# Using conda
 conda install <package_name>
 
 # For packages available in pip
@@ -42,3 +47,8 @@ python project.py
 - **NLP**:
     - Textacy for keyword extraction
     - Lexrank for automatic summarization
+
+### Future Roadmap
+- [ ] Containerize
+- [ ] Server
+- [ ] Web UI
